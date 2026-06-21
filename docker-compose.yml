@@ -1,0 +1,86 @@
+services:
+
+  oracle:
+    image: gvenzl/oracle-xe:21-slim
+    container_name: oracle-shopconnect
+    environment:
+      ORACLE_PASSWORD: admin123
+      APP_USER: SHOPCONNECT
+      APP_USER_PASSWORD: SHOPCONNECT123
+    ports:
+      - "1521:1521"
+    volumes:
+      - oracle_data:/opt/oracle/oradata
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+
+  ms-productos:
+    build: ./ms-productos
+    container_name: ms-productos
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:oracle:thin:@oracle:1521/XEPDB1
+      SPRING_DATASOURCE_USERNAME: SHOPCONNECT
+      SPRING_DATASOURCE_PASSWORD: SHOPCONNECT123
+    depends_on:
+      oracle:
+        condition: service_healthy
+
+  ms-usuarios:
+    build: ./ms-usuarios
+    container_name: ms-usuarios
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:oracle:thin:@oracle:1521/XEPDB1
+      SPRING_DATASOURCE_USERNAME: SHOPCONNECT
+      SPRING_DATASOURCE_PASSWORD: SHOPCONNECT123
+    depends_on:
+      oracle:
+        condition: service_healthy
+
+  ms-pedidos:
+    build: ./ms-pedidos
+    container_name: ms-pedidos
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:oracle:thin:@oracle:1521/XEPDB1
+      SPRING_DATASOURCE_USERNAME: SHOPCONNECT
+      SPRING_DATASOURCE_PASSWORD: SHOPCONNECT123
+    depends_on:
+      oracle:
+        condition: service_healthy
+
+  ms-pagos:
+    build: ./ms-pagos
+    container_name: ms-pagos
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:oracle:thin:@oracle:1521/XEPDB1
+      SPRING_DATASOURCE_USERNAME: SHOPCONNECT
+      SPRING_DATASOURCE_PASSWORD: SHOPCONNECT123
+    depends_on:
+      oracle:
+        condition: service_healthy
+
+  ms-inventario:
+    build: ./ms-inventario
+    container_name: ms-inventario
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:oracle:thin:@oracle:1521/XEPDB1
+      SPRING_DATASOURCE_USERNAME: SHOPCONNECT
+      SPRING_DATASOURCE_PASSWORD: SHOPCONNECT123
+    depends_on:
+      oracle:
+        condition: service_healthy
+
+volumes:
+  oracle_data:
